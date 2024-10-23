@@ -2,21 +2,21 @@
 
 ## 1. Introdução
 
-Este relatório documenta os testes realizados na aplicação de cálculo de cashback, com foco na aplicação do critério de Análise do Valor Limite (AVL). A aplicação em questão calcula o valor de cashback que os clientes recebem com base em suas compras e no grau de fidelidade (Bronze, Prata, Ouro).
+Este documento relata os testes realizados sobre o sistema de cálculo de cashback, com foco na aplicação da técnica de Análise de Limite de Valor (AVL). A funcionalidade em questão calcula o cashback recebido pelos clientes com base em suas compras e seu nível de fidelidade (Bronze, Prata, Ouro).
 
 ### Objetivo dos Testes
 
-O objetivo dos testes é garantir que a aplicação calcula corretamente o cashback para diferentes valores de compra, especialmente nos pontos críticos, ou seja, nos limites das faixas de valor onde as regras de cashback mudam. Esses testes são essenciais para identificar possíveis erros ou comportamentos inesperados no cálculo de cashback quando valores de entrada estão nos extremos.
+O principal objetivo dos testes é verificar a correta aplicação do cálculo de cashback para diferentes faixas de compra, especialmente nos pontos críticos onde as regras de cashback mudam. O foco é identificar possíveis falhas ou comportamentos inesperados nos valores-limite, onde transições ocorrem entre diferentes percentuais de cashback.
 
-### Importância da Análise do Valor Limite
+### Relevância da Análise do Valor Limite
 
-A Análise do Valor Limite é uma técnica de teste que foca nos valores de entrada que estão nos limites das faixas de entrada válidas. Esta técnica é importante porque erros de software são mais prováveis de ocorrer em valores de limite do que em valores internos, devido à transição de uma lógica para outra. Portanto, testar esses limites ajuda a garantir a robustez do sistema.
+A Análise de Limite de Valor é uma técnica de teste que concentra-se em verificar os valores nos limites das faixas definidas. Esta abordagem é essencial, pois erros tendem a ocorrer mais frequentemente nos valores próximos aos limites, onde a lógica do sistema muda. Assim, testar esses pontos críticos é fundamental para garantir a estabilidade e confiabilidade do sistema.
 
 ## 2. Análise do Valor Limite
 
 ### Casos de Teste
 
-Os valores escolhidos para os testes incluem os limites das faixas de cashback: imediatamente abaixo do limite inferior (R$ 99,99), no limite inferior (R$ 100,00), logo acima do limite inferior (R$ 100,01 e R$ 100,02), próximo ao limite superior (R$ 499,99), no limite superior (R$ 500,00) e logo acima do limite superior (R$ 500,01). Essa abordagem permite verificar a precisão da implementação para cada ponto crítico de mudança nas faixas de cashback.
+Os casos de teste escolhidos abrangem os limites das faixas de cashback: imediatamente abaixo do limite inferior (R$ 99,99), no limite inferior (R$ 100,00), logo acima do limite inferior (R$ 100,01 e R$ 100,02), próximo ao limite superior (R$ 499,99), no limite superior (R$ 500,00) e logo acima do limite superior (R$ 500,01). A ideia é verificar a precisão do sistema em cada transição de faixa de cashback.
 
 1. **Faixa de até R$ 100 (5% de cashback):**
    - **Valor de Compra:** R$ 99,99 | **Grau de Fidelidade:** Bronze, Prata, Ouro
@@ -34,13 +34,13 @@ Os valores escolhidos para os testes incluem os limites das faixas de cashback: 
 
 ### Aplicação do Critério
 
-Para cada combinação de valor limite e grau de fidelidade, foram testados os valores imediatamente abaixo, no limite, e acima do limite. Isso garante que o sistema responde corretamente às transições entre as faixas de cashback e aplica os ajustes de fidelidade adequadamente.
+Para cada combinação de valor-limite e nível de fidelidade, foram testados valores imediatamente abaixo, no próprio limite e acima dele. Isso garante que o sistema está tratando corretamente as transições entre as faixas de cashback, além de aplicar adequadamente os percentuais correspondentes ao nível de fidelidade.
 
 ## 3. Execução dos Testes
 
-### Processo de Execução
+### Procedimento de Execução
 
-Os testes foram implementados utilizando JUnit 4 e executados via Maven. Para cada combinação de valor e grau de fidelidade, foram escritos métodos de teste específicos que verificam se o valor de cashback calculado corresponde ao esperado.
+Os testes foram escritos com o uso do JUnit 4 e executados via Maven. Cada cenário de teste avaliou se o cashback calculado pelo sistema estava correto, comparando os resultados obtidos com os esperados.
 
 ### Resultados dos Testes
 
@@ -75,19 +75,19 @@ Os testes foram implementados utilizando JUnit 4 e executados via Maven. Para ca
 
 ## Execução dos Testes
 ###  Resultados dos Testes
-Durante a execução dos testes, foi identificada uma falha para o valor de R$ 500,00 em todos os graus de fidelidade. O sistema retornou valores de cashback como se o valor fosse superior a R$ 500,00, aplicando percentuais de 15% para Bronze, 20% para Prata e 25% para Ouro. Os testes para este valor foram reexecutados considerando a faixa de cashback para valores acima de R$ 500,00.
+Durante os testes, foi identificada uma falha recorrente para o valor de R$ 500,00. O sistema aplicou percentuais de cashback como se o valor fosse superior a R$ 500,00, causando um erro no cálculo. O valor foi tratado como pertencente à faixa superior, aplicando percentuais incorretos para os diferentes níveis de fidelidade (15% para Bronze, 20% para Prata e 25% para Ouro).
 
-- **Testes realizados:** 24
-- **Testes bem-sucedidos:**21
+- **Testes realizados:** 22
+- **Testes bem-sucedidos:**19
 
-Esse erro ocorreu devido a uma escolha de lógica na implementação do método, onde o cálculo para o valor acima de 500, pegava o valor 500 em si ou seja é uma faixa maior ou igual a.
+A falha foi causada por um erro na lógica de comparação do valor limite, onde R$ 500,00 estava sendo incluído indevidamente na faixa superior.
 
 
 ## 4. Conclusão
 
-Os testes revelaram que o sistema, de maneira geral, lida corretamente com os valores de entrada, exceto para o caso específico de R$ 500,00. A implementação atual considera R$ 500,00 como parte da faixa superior (> R$ 500,00), aplicando percentuais de cashback incorretos. Este comportamento foi detectado através de testes de caixa-preta, que assumiam que R$ 500,00 estaria na faixa intermediária.
+Os testes mostraram que, no geral, o sistema realiza os cálculos de cashback corretamente, com exceção do valor de R$ 500,00. A lógica atual trata este valor como parte da faixa superior, aplicando percentuais maiores do que o esperado. Essa falha foi identificada por meio de testes de caixa-preta que consideravam que R$ 500,00 pertencia à faixa intermediária.
 
 ### Avaliação da Robustez
 
-Embora a maioria dos testes tenha sido bem-sucedida, a falha encontrada com o valor de R$ 500,00 indica que a lógica de decisão no código precisa ser revisada para garantir que os limites sejam corretamente tratados. Esse problema sugere uma vulnerabilidade na implementação que pode afetar a precisão do cálculo do cashback, comprometendo a confiança dos clientes e a integridade financeira do sistema.
+Embora a maioria dos casos tenha passado nos testes, a falha observada com o valor de R$ 500,00 revela uma vulnerabilidade na lógica de decisão, exigindo ajustes para que os limites sejam corretamente tratados. Este erro compromete a precisão dos cálculos de cashback e, consequentemente, a confiabilidade do sistema aos olhos dos clientes.
 
